@@ -264,7 +264,8 @@ class Robot:
                     self.ev3.speaker.beep()
                 
                 if self.CheckIfOutOfBounds():
-                    return
+                    self.ReturnToHomeBase()
+                    self.ev3.speaker.say("Out of bounds detected. Returning to home base.")
         
         # After completing the grid, return to home base
         self.ReturnToHomeBase()
