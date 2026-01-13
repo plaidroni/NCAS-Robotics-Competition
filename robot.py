@@ -6,6 +6,7 @@ from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
+import time
 
 class Robot:
     # Constants - will be set from main
@@ -129,6 +130,14 @@ class Robot:
 
 # ambient()
 # Measures the ambient light intensity.
+
+    def straightSimple(self, distance, forwards=1):
+        
+        self.front_drive_base.drive((distance * forwards), 0)
+        # assuming default speed of 200mm/s
+        time.sleep(distance / 200)
+        
+
 
 # rgb()
 # Measures the reflection of a surface using a red, green, and then a blue light.
