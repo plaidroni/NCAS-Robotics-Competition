@@ -21,6 +21,10 @@ TILE_WIDTH = LENGTH_ARENA // COLUMNS  # Size of each tile in millimeters.
 HOME_BASE_X = 0
 HOME_BASE_Y = 0
 
+#mineral dictionary
+MINERALS = []
+
+
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
@@ -30,16 +34,19 @@ ultrasonic_sensor = UltrasonicSensor(Port.S2)
 touch_sensor = TouchSensor(Port.S3)
 
 # Initialize the motors.
-left_motor = Motor(Port.D)
-right_motor = Motor(Port.C)
+front_left_motor = Motor(Port.D)
+front_right_motor = Motor(Port.C)
+back_left_motor = Motor(Port.B)
+back_right_motor = Motor(Port.A)
 
 # Initialize the drive base.
-robot = DriveBase(left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK)
+front_drive_base = DriveBase(front_left_motor, front_right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK)
+back_drive_base = DriveBase(back_left_motor, back_right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK)
+
+#initialize the robot
+robot = Robot(front_drive_base=front_drive_base, back_drive_base=back_drive_base, color_sensor=color_sensor, ultrasonic_sensor=ultrasonic_sensor, touch_sensor=touch_sensor)
 
 
-# Go forward and backwards for one meter.
-robot.straight(1000)
-ev3.speaker.beep()
 #starts in bottom left corner of the grid, facing upwards
 def StartGridMovement():
     for row in range(ROWS):
@@ -58,7 +65,7 @@ def StartGridMovement():
                 if(CheckIfOutOfBounds()):
                     return
     # after completing the grid, turn around to face the starting grid position
-    robot.turn(180)
+    ReturnToHomeBase(robot.x, robot.y)
 
 def CheckIfOutOfBounds():
     distance = ultrasonic_sensor.distance()
@@ -92,4 +99,5 @@ def ReturnToHomeBase(currentX, currentY):
 def StartCollectItem():
     # TODO: Implement item collection logic / motor control to start collection
     ev3.speaker.beep()
-    
+#raise collection motor
+def EndCollectItem():
