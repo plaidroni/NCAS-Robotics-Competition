@@ -156,11 +156,11 @@ class Robot:
 
     def clawOpen(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(200, 180)  # Open claw by 90 degrees
+            self.claw_motor.run_angle(200, 300)  # Open claw by 90 degrees
 
     def clawClose(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(800, -180)  # Close claw by 90 degrees
+            self.claw_motor.run_angle(800, -300)  # Close claw by 90 degrees
 
     def StartCollectItem(self):
         self.clawOpen()
