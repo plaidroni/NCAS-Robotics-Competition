@@ -34,10 +34,10 @@ MINERALS = []
 # touch_sensor = TouchSensor(Port.S3)
 # gyro_sensor = GyroSensor(Port.S4)
 
-color_sensor = None
-ultrasonic_sensor = None
-touch_sensor = None
-gyro_sensor = None
+color_sensor = ColorSensor(Port.S1)
+ultrasonic_sensor = UltrasonicSensor(Port.S2)
+# touch_sensor = TouchSensor(Port.S3)
+gyro_sensor = GyroSensor(Port.S4)
 
 # Initialize the motors.
 front_left_motor = Motor(Port.D)

@@ -30,7 +30,7 @@ ev3 = EV3Brick()
 #Initialize the sensors
 color_sensor = ColorSensor(Port.S1)
 ultrasonic_sensor = UltrasonicSensor(Port.S2)
-touch_sensor = TouchSensor(Port.S3)
+# touch_sensor = TouchSensor(Port.S3)
 gyro_sensor = GyroSensor(Port.S4)
 
 # Initialize the motors.
