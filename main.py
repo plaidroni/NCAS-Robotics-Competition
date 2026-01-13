@@ -12,13 +12,13 @@ from robot import Robot
 ev3 = EV3Brick()
 
 #constants
-WHEEL_DIAMETER = 140  # Wheel diameter in millimeters.
+WHEEL_DIAMETER = 35  # Wheel diameter in millimeters.
 AXLE_TRACK = 230       # Distance between the centers of the two wheels.
 LENGTH_ARENA = 1800  # Arena dimensions in millimeters.
 WIDTH_ARENA = 1800  # Arena dimensions in millimeters.
 #we should find the numbers of rows and columns during our walkthrough of the arena
-ROWS = 6  # Number of rows of tiles.
-COLUMNS = 3  # Number of columns of tiles.
+ROWS = 3  # Number of rows of tiles.
+COLUMNS = 6  # Number of columns of tiles.
 TILE_WIDTH = LENGTH_ARENA // COLUMNS  # Size of each tile in millimeters.
 HOME_BASE_X = 0
 HOME_BASE_Y = 0

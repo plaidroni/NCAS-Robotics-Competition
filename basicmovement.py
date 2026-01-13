@@ -6,6 +6,7 @@ from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
+from robot import Robot
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
@@ -21,7 +22,7 @@ COLUMNS = 3  # Number of columns of tiles.
 TILE_WIDTH = LENGTH_ARENA // COLUMNS  # Size of each tile in millimeters.
 HOME_BASE_X = 0
 HOME_BASE_Y = 0
-global totalDistance = 0
+totalDistance = 0
 
 
 # Initialize the EV3 Brick.
@@ -49,7 +50,7 @@ robot = Robot(
         # back_drive_base=back_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
-        touch_sensor=touch_sensor,
+        touch_sensor=None,
         gyro_sensor=gyro_sensor
     )
 #drive straight until obstacle is detected, then drive up and collect the object then stop

@@ -7,7 +7,6 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
 import time
-import webcolors
 
 class Robot:
     # Constants - will be set from main
@@ -67,8 +66,24 @@ class Robot:
         self.front_drive_base.stop()
 
     def turn(self, angle):
+        # First perform the turn
         self.front_drive_base.turn(angle)
         self.theta = (self.theta + angle) % 360
+        
+        # If gyro sensor available, snap to nearest 90-degree increment
+        if self.gyro_sensor:
+            current_gyro = self.gyro_sensor.angle()
+            # Find the nearest 90-degree increment
+            snapped_angle = round(current_gyro / 90) * 90
+            # Calculate correction needed
+            correction = snapped_angle - current_gyro
+            
+            # Apply correction if it's significant
+            if abs(correction) > 2:
+                self.front_drive_base.turn(correction)
+                self.theta = snapped_angle % 360
+            else:
+                self.theta = snapped_angle % 360
 
 
     # Move straight while checking for obstacles
@@ -125,47 +140,16 @@ class Robot:
         # Update position based on heading
         self.x += distance * math.cos(math.radians(self.theta))
         self.y += distance * math.sin(math.radians(self.theta))
-# from docs
-#     color()
-# Measures the color of a surface.
-
-# ambient()
-# Measures the ambient light intensity.
 
     def straightSimple(self, distance, forwards=1):
-        
         self.front_drive_base.drive((distance * forwards), 0)
         # assuming default speed of 200mm/s
         time.sleep(distance / 200)
-        
-def get_color_name(rgb_tuple):
-    try:
-        # Convert RGB to hex
-        hex_value = webcolors.rgb_to_hex(rgb_tuple)
-        # Get the color name directly
-        return webcolors.hex_to_name(hex_value)
-    except ValueError:
-        # If exact match not found, find the closest color
-        return closest_color(rgb_tuple)
-
-def findColor():
-    color = [0, 0, 0]
-    for i in range(len(self.color_sensor.rgb())):
-        color[i] = (self.color_sensor.rgb()[i] * 255)
-    return get_color_name((color[0], color[1], color[2]))
-
-# rgb()
-# Measures the reflection of a surface using a red, green, and then a blue light.
-
-    # Identify material using color sensor and beep based on material
+    
     def identify_material(self):
         if self.color_sensor:
-            
-            # ideally a better method
-            return findColor()
-
-            #color = self.color_sensor.color()
-            #return color
+            color = self.color_sensor.color()
+            return color
         return None
 
     def StartCollectItem(self):
@@ -269,14 +253,14 @@ def findColor():
             
             if row < self.ROWS - 1:
                 if row % 2 == 0:
-                    self.turn(90)
+                    self.turn(70)
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
-                    self.turn(90)  # Turn right to face the next row
+                    self.turn(70)  # Turn right to face the next row
                     self.ev3.speaker.beep()
                 else:
-                    self.turn(-90)  # Turn left at the end of the row
+                    self.turn(-70)  # Turn left at the end of the row
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
-                    self.turn(-90)  # Turn left to face the next row
+                    self.turn(-70)  # Turn left to face the next row
                     self.ev3.speaker.beep()
                 
                 if self.CheckIfOutOfBounds():
