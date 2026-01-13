@@ -184,7 +184,7 @@ class Robot:
     def StartCollectItem(self):
         self.ev3.speaker.say("Object detected, collecting now.")
         self.clawOpen()
-        self.straightSimple(10, forwards=1)  # Move forward 100mm to align with object
+        self.straightSimple(10, forwards=1)
         self.isCollecting = True
         wait(250)  # Brief pause
         self.clawClose()  # Actually grab the object
@@ -349,6 +349,4 @@ class Robot:
             if distance > 250:
                 distance = 250
 
-            # Move closer toward the obstacle
-            self.straightSimple(10, forwards=1)  # Move forward 10mm
-
+    
