@@ -54,23 +54,8 @@ robot = Robot(
         claw_motor=grabber_motor,
     )
 #drive straight until obstacle is detected, then drive up and collect the object then stop
-def DriveUntilObstacleAndCollect():
-    while True:
-        distance = robot.ultrasonic_sensor.distance()
 
-        robot.checkMaterials()
 
-        if distance < 50: #percentage distance to obstacle
-            robot.StartCollectItem()
-            robot.drive(-200)  # go back the total distance traveled
-            robot.ev3.speaker.beep()
-            break
-
-        # just because ultasonic sensors can be a bit iffy sometimes
-        elif distance > 500:
-            distance = 500
-
-        robot.straightSimple(distance)
 
 # DriveUntilObstacleAndCollect()
 

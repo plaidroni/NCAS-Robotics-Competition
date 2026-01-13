@@ -173,20 +173,22 @@ class Robot:
 
     def clawOpen(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(200, 720)  # Open claw by 90 degrees
+            # Higher speed and hold to fully open
+            self.claw_motor.run_angle(600, 720, then=Stop.HOLD, wait=True)
 
     def clawClose(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(800, -720)  # Close claw by 90 degrees
+            # Higher speed and hold to fully close
+            self.claw_motor.run_angle(800, -720, then=Stop.HOLD, wait=True)
 
     def StartCollectItem(self):
         self.clawOpen()
         wait(500)  # Wait for claw to open
         self.isCollecting = True
         self.ev3.speaker.beep()
-        #wait(1000)  # Wait for grabbing action
-        #self.clawClose()
-        wait(500)  # Wait for claw to close
+        wait(500)  # Brief pause
+        self.clawClose()  # Actually grab the object
+        wait(500)  # Allow close to finish
 
     def EndCollectItem(self):
         self.clawClose()
@@ -327,3 +329,24 @@ class Robot:
         deltaX = x2 - x1
         distance = math.sqrt(deltaX**2 + deltaY**2)
         return distance
+
+    def DriveUntilObstacleAndCollect():
+    robot.drive(200)  # set a constant speed
+    while True:
+        distance = robot.ultrasonic_sensor.distance()
+
+        robot.checkMaterials()
+
+        if distance < 10: #percentage distance to obstacle
+            self.front_drive_base.stop()
+            self.StartCollectItem()
+            self.drive(-200)  # go back the total distance traveled
+            self.ev3.speaker.beep()
+            break
+
+        # just because ultasonic sensors can be a bit iffy sometimes
+        elif distance > 500:
+            distance = 500
+
+        self.straightSimple(distance)
+

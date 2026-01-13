@@ -72,7 +72,7 @@ def bootSequence():
     robot.ev3.screen.print("L-Simple, R-Grid")
     while True:
         if (Button.LEFT in robot.ev3.buttons.pressed()):
-            DriveUntilObstacleAndCollect()
+            robot.DriveUntilObstacleAndCollect()
             while True:
                 robot.checkMaterials()
         elif (Button.RIGHT in robot.ev3.buttons.pressed()):
