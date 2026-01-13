@@ -182,13 +182,14 @@ class Robot:
             self.claw_motor.run_angle(800, -720, then=Stop.HOLD, wait=True)
 
     def StartCollectItem(self):
+        self.ev3.speaker.say("Object detected, collecting now.")
         self.clawOpen()
-        wait(500)  # Wait for claw to open
+        self.straightSimple(10, forwards=1)  # Move forward 100mm to align with object
         self.isCollecting = True
-        self.ev3.speaker.beep()
-        wait(500)  # Brief pause
+        wait(250)  # Brief pause
         self.clawClose()  # Actually grab the object
-        wait(500)  # Allow close to finish
+        self.ev3.speaker.say("Object collected, on my way home")
+        wait(250)  # Allow close to finish
 
     def EndCollectItem(self):
         self.clawClose()
@@ -330,23 +331,24 @@ class Robot:
         distance = math.sqrt(deltaX**2 + deltaY**2)
         return distance
 
-    def DriveUntilObstacleAndCollect():
-    robot.drive(200)  # set a constant speed
-    while True:
-        distance = robot.ultrasonic_sensor.distance()
+    def DriveUntilObstacleAndCollect(self):
+        # Drive forward until an obstacle is detected, then collect it
+        self.front_drive_base.drive(200, 0)
+        while True:
+            distance = self.ultrasonic_sensor.distance()
 
-        robot.checkMaterials()
+            self.checkMaterials()
 
-        if distance < 10: #percentage distance to obstacle
-            self.front_drive_base.stop()
-            self.StartCollectItem()
-            self.drive(-200)  # go back the total distance traveled
-            self.ev3.speaker.beep()
-            break
+            if distance < 125:  # threshold to stop
+                self.front_drive_base.stop()
+                self.StartCollectItem()
+                self.ev3.speaker.beep()
+                break
 
-        # just because ultasonic sensors can be a bit iffy sometimes
-        elif distance > 500:
-            distance = 500
+            # Cap noisy readings
+            if distance > 250:
+                distance = 250
 
-        self.straightSimple(distance)
+            # Move closer toward the obstacle
+            self.straightSimple(10, forwards=1)  # Move forward 10mm
 
