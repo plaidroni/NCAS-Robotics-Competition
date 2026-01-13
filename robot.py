@@ -20,6 +20,7 @@ class Robot:
     ultrasonic_sensor = None
     touch_sensor = None
     gyro_sensor = None
+    claw_motor = None
     isCollecting = False
     sensorIndex = 0
     distanceToEndOfPath = 0
@@ -37,7 +38,8 @@ class Robot:
         color_sensor=None,
         ultrasonic_sensor=None,
         # touch_sensor=None,
-        gyro_sensor=None
+        gyro_sensor=None,
+        claw_motor=None
     ):
         self.x = 0
         self.y = 0
@@ -152,8 +154,16 @@ class Robot:
             return color
         return None
 
+    def clawOpen(self):
+        if self.claw_motor:
+            self.claw_motor.run_angle(200, 90)  # Open claw by 90 degrees
+
+    def clawClose(self):
+        if self.claw_motor:
+            self.claw_motor.run_angle(200, -90)  # Close claw by 90 degrees
+
     def StartCollectItem(self):
-        # TODO: Implement item collection logic / motor control to start collection
+        self.clawClose()
         self.isCollecting = True
         self.ev3.speaker.beep()
         # Add motor control for collection mechanism here
@@ -161,7 +171,7 @@ class Robot:
         self.EndCollectItem()
 
     def EndCollectItem(self):
-        # TODO: Lower collection motor
+        self.clawClose()
         self.isCollecting = False
         self.ev3.speaker.beep()
 

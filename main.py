@@ -51,7 +51,8 @@ robot = Robot(
         front_drive_base=front_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
-        gyro_sensor=gyro_sensor
+        gyro_sensor=gyro_sensor,
+        claw_motor=grabber_motor
     )
 
 # Set constants for the robot

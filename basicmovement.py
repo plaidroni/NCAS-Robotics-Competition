@@ -37,6 +37,7 @@ gyro_sensor = GyroSensor(Port.S4)
 # Initialize the motors.
 front_left_motor = Motor(Port.D)
 front_right_motor = Motor(Port.C)
+grabber_motor = Motor(Port.B)
 # back_left_motor = Motor(Port.B)
 # back_right_motor = Motor(Port.A)
 
@@ -50,8 +51,8 @@ robot = Robot(
         # back_drive_base=back_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
-        touch_sensor=None,
-        gyro_sensor=gyro_sensor
+        gyro_sensor=gyro_sensor,
+        claw_motor=grabber_motor,
     )
 #drive straight until obstacle is detected, then drive up and collect the object then stop
 def DriveUntilObstacleAndCollect():
