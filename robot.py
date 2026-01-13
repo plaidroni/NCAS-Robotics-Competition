@@ -8,11 +8,17 @@ from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
 
 class Robot:
+    # Constants - will be set from main
+    ROWS = 6
+    COLUMNS = 3
+    TILE_WIDTH = 600
+    HOME_BASE_X = 0
+    HOME_BASE_Y = 0
+    
     x = 0
     y = 0
     theta = 0  # orientation angle in degrees
     front_drive_base = None
-    back_drive_base = None
     color_sensor = None
     ultrasonic_sensor = None
     touch_sensor = None
@@ -24,64 +30,97 @@ class Robot:
     thresholdAngle = 5
     pathOK = True
     obstacleDetectedLocations = []
-
+    testingSensors = False
+    ev3 = None
 
     def __init__(
-    self,
-     front_drive_base,
-    #   back_drive_base=None,
-       color_sensor=None,
+        self,
+        ev3,
+        front_drive_base,
+        color_sensor=None,
         ultrasonic_sensor=None,
-         touch_sensor=None,
-          gyro_sensor=None
-          ):
+        touch_sensor=None,
+        gyro_sensor=None
+    ):
         self.x = 0
         self.y = 0
         self.theta = 0
+        self.ev3 = ev3
         self.front_drive_base = front_drive_base
-        # self.back_drive_base = back_drive_base
         self.color_sensor = color_sensor
         self.ultrasonic_sensor = ultrasonic_sensor
         self.touch_sensor = touch_sensor
         self.gyro_sensor = gyro_sensor
+        
+        
+        if self.gyro_sensor:
+            self.gyro_sensor.reset_angle(0)
+            self.ev3.speaker.beep()
+            wait(10)
+    
     def get_position(self):
         return (self.x, self.y)
+    
     def set_position(self, x, y):
         self.x = x
         self.y = y
 
-    def 
+    def stop(self):
+        self.front_drive_base.stop()
 
     def turn(self, angle):
         self.front_drive_base.turn(angle)
         self.theta = (self.theta + angle) % 360
-        # if self.back_drive_base:
-        #     self.back_drive_base.turn(angle)
-    #if robot finds an obstacle on the ultrasonic sensor, it should stop
+
+    # Move straight while checking for obstacles
     def straight(self, distance):
-        self.front_drive_base.drive(distance)
-
-        while self.pathOK:
-            distanceToObstacle = self.ultrasonic_sensor.distance()
-            #return to 90, 0, 180, 270 heading
-            if self.gyro_sensor.angle() > self.theta + self.thresholdAngle or self.gyro_sensor.angle() < self.theta - self.thresholdAngle:
-                self.turn(self.theta - self.gyro_sensor.angle())
-            identifyMaterial()
-                # if object is detected, stop and collect them. we should then return to path
-            if distanceToObstacle < 10:
-                self.front_drive_base.stop()
-                if self.back_drive_base:
-                    self.back_drive_base.stop()
-                self.obstacleDetectedLocations.append((self.x, self.y))
-                self.StartCollectItem()
-                self.ReturnToHomeBase(self.x, self.y)
-                self.pathOK = False
-                break
-
-        # if self.back_drive_base:
-        #     self.back_drive_base.straight(distance)
-
-        #make distance calculation based on heading
+        start_distance = self.front_drive_base.distance()
+        target_distance = start_distance + distance
+        
+        self.front_drive_base.drive(200, 0) #drive forward at 200mm/s
+        
+        while abs(self.front_drive_base.distance() - target_distance) > 10:
+            # Check for obstacles if ultrasonic sensor is available
+            if self.ultrasonic_sensor:
+                distanceToObstacle = self.ultrasonic_sensor.distance()
+                
+                # If object is detected, stop and collect it
+                if distanceToObstacle < 50:  # 50mm threshold
+                    self.front_drive_base.stop()
+                    self.obstacleDetectedLocations.append((self.x, self.y))
+                    
+                    # Keep identifying material
+                    material = self.identify_material()
+                    #TODO: do something with material info
+                    
+                    self.StartCollectItem()
+                    
+                    # Save position and heading before moving
+                    start_x, start_y = self.x, self.y
+                    saved_theta = self.theta
+                    
+                    self.ReturnToHomeBase()
+                    
+                    # Return to where we found the object and continue
+                    self.GoToPosition(start_x, start_y)
+                    self.ReturnToAngle(saved_theta)
+                    
+                    # Restart driving
+                    self.front_drive_base.drive(200, 0)
+            
+            # Maintain heading if gyro sensor is available
+            if self.gyro_sensor:
+                current_angle = self.gyro_sensor.angle()
+                if abs(current_angle - self.theta) > self.thresholdAngle:
+                    self.front_drive_base.stop()
+                    self.turn(self.theta - current_angle)
+                    self.front_drive_base.drive(200, 0)
+            
+            wait(50)
+        
+        self.front_drive_base.stop()
+        
+        # Update position based on heading
         self.x += distance * math.cos(math.radians(self.theta))
         self.y += distance * math.sin(math.radians(self.theta))
 # from docs
@@ -94,76 +133,141 @@ class Robot:
 # rgb()
 # Measures the reflection of a surface using a red, green, and then a blue light.
 
-#TODO: implement identify material function and beep based on material
+    # Identify material using color sensor and beep based on material
     def identify_material(self):
         if self.color_sensor:
             color = self.color_sensor.color()
             return color
         return None
 
-    def StartCollectItem(p):
+    def StartCollectItem(self):
         # TODO: Implement item collection logic / motor control to start collection
-        ev3.speaker.beep()
-    #raise collection motor
-    def EndCollectItem():
+        self.isCollecting = True
+        self.ev3.speaker.beep()
+        # Add motor control for collection mechanism here
+        
+        self.EndCollectItem()
 
-    def UpdateAndCheckAngle():
+    def EndCollectItem(self):
+        # TODO: Lower collection motor
+        self.isCollecting = False
+        self.ev3.speaker.beep()
+
+    def UpdateAndCheckAngle(self):
         if self.gyro_sensor:
             self.theta = self.gyro_sensor.angle()
             return self.theta
         return None
 
-    def TestSensors():
-        if(self.touch_sensor.pressed()):
-            ev3.speaker.beep()
-            #flip
+    def TestSensors(self):
+        if self.touch_sensor and self.touch_sensor.pressed():
+            self.ev3.speaker.beep()
+            # Flip sensor index
             self.sensorIndex = (self.sensorIndex + 1) % 4
         
         while self.testingSensors:
-            switch self.sensorIndex:
-                case 0:
-                    if self.touch_sensor:
-                        if self.touch_sensor.pressed():
-                            ev3.speaker.beep()
-                case 1:
-                    if self.ultrasonic_sensor:
-                        distance = self.ultrasonic_sensor.distance()
-                        print(distance)
-                        ev3.speaker.beep(frequency=440 + distance, duration=100)
-                case 2:
-                    if self.color_sensor:
-                        color = self.color_sensor.color()
-                        print(color)
-                        ev3.speaker.beep(frequency=440 + color * 100, duration=100)
-                case 3:
-                    if self.gyro_sensor:
-
+            if self.sensorIndex == 0:
+                if self.touch_sensor:
+                    if self.touch_sensor.pressed():
+                        self.ev3.speaker.beep()
+            elif self.sensorIndex == 1:
+                if self.ultrasonic_sensor:
+                    distance = self.ultrasonic_sensor.distance()
+                    print(distance)
+                    
+            elif self.sensorIndex == 2:
+                if self.color_sensor:
+                    color = self.color_sensor.color()
+                    print(color)
+                    
+            elif self.sensorIndex == 3:
+                if self.gyro_sensor:
+                    angle = self.gyro_sensor.angle()
+                    print(angle)
+                   
+            
             wait(50)
-          
-    def ReturnToAngle(targetAngle):
-        #logic to return to path after ReturnToHomeBase
-        currentAngle = self.gyro_sensor.angle()
-        angleDiff = targetAngle - currentAngle
-        self.turn(angleDiff)
+    
+    def ReturnToAngle(self, targetAngle):
+        # Logic to return to path after ReturnToHomeBase
+        if self.gyro_sensor:
+            currentAngle = self.gyro_sensor.angle()
+            angleDiff = targetAngle - currentAngle
+            self.turn(angleDiff)
+        else:
+            # If no gyro, turn to target angle based on current theta
+            angleDiff = targetAngle - self.theta
+            self.turn(angleDiff)
 
-    #starts in bottom left corner of the grid, facing upwards
-    def StartGridMovement():
-        for row in range(ROWS):
-            for col in range(COLUMNS - 1):
-                self.straight(TILE_WIDTH)  # move forward one tile
-                ev3.speaker.beep()
-            if row < ROWS - 1:
+    def GoToPosition(self, target_x, target_y):
+        # Calculate angle and distance to target
+        deltaX = target_x - self.x
+        deltaY = target_y - self.y
+        distance = math.sqrt(deltaX**2 + deltaY**2)
+        
+        if distance < 10:  # Already at target, no need to move
+            return
+            
+        targetAngle = math.degrees(math.atan2(deltaY, deltaX))
+        
+        # Turn to face target
+        angleDiff = targetAngle - self.theta
+        self.turn(angleDiff)
+        
+        # Drive to target WITHOUT obstacle checking (internal navigation)
+        self.front_drive_base.straight(distance)
+        
+        # Update position
+        self.x = target_x
+        self.y = target_y
+
+    def ReturnToHomeBase(self):
+        # Return to home base at (0, 0)
+        self.GoToPosition(self.HOME_BASE_X, self.HOME_BASE_Y)
+    # Check with color sensor to see if near boundary (BLUE TAPE ON GROUND)
+    def CheckIfOutOfBounds(self):
+        if self.color_sensor:
+            if self.color_sensor.color() == Color.BLUE:
+                self.ev3.speaker.beep()
+                return True
+        return False
+
+    # Starts in bottom left corner of the grid, facing upwards (theta=90), but absolute gyro is 0
+    def StartGridMovement(self):
+        for row in range(self.ROWS):
+            for col in range(self.COLUMNS - 1):
+                self.straight(self.TILE_WIDTH)  # Move forward one tile
+                self.ev3.speaker.beep()
+            
+            if row < self.ROWS - 1:
                 if row % 2 == 0:
                     self.turn(90)
-                    self.straight(TILE_WIDTH)  # move down to the next row.
-                    self.turn(90)  # turn right to face the next row.
+                    self.straight(self.TILE_WIDTH)  # Move down to the next row
+                    self.turn(90)  # Turn right to face the next row
                 else:
-                    self.turn(-90)  # turn left at the end of the row.
-                    self.straight(TILE_WIDTH)  # move down to the next row.
-                    self.turn(-90)  # turn left to face the next row.
-                    if(CheckIfOutOfBounds()):
-                        return
-        # after completing the grid, turn around to face the starting grid position and drive
-        self.ReturnToHomeBase(self.x, self.y)
+                    self.turn(-90)  # Turn left at the end of the row
+                    self.straight(self.TILE_WIDTH)  # Move down to the next row
+                    self.turn(-90)  # Turn left to face the next row
+                
+                if self.CheckIfOutOfBounds():
+                    return
+        
+        # After completing the grid, return to home base
+        self.ReturnToHomeBase()
         self.ReturnToAngle(0)
-        self.StartGridMovement()
+        # Could restart grid movement here if needed
+        # self.StartGridMovement()
+
+    def FindAngleBetweenPoints(self, x1, y1, x2, y2):
+        deltaY = y2 - y1
+        deltaX = x2 - x1
+        angleInRadians = math.atan2(deltaY, deltaX)
+        angleInDegrees = math.degrees(angleInRadians)
+        return angleInDegrees
+
+    # Pythag theorem to find distance between 2 points
+    def FindDistanceBetweenPoints(self, x1, y1, x2, y2):
+        deltaY = y2 - y1
+        deltaX = x2 - x1
+        distance = math.sqrt(deltaX**2 + deltaY**2)
+        return distance

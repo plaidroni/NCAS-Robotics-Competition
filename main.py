@@ -23,6 +23,7 @@ TILE_WIDTH = LENGTH_ARENA // COLUMNS  # Size of each tile in millimeters.
 HOME_BASE_X = 0
 HOME_BASE_Y = 0
 
+
 #mineral dictionary
 MINERALS = []
 
@@ -51,38 +52,20 @@ front_drive_base = DriveBase(front_left_motor, front_right_motor, wheel_diameter
 
 #initialize the robot
 robot = Robot(
+        ev3=ev3,
         front_drive_base=front_drive_base,
-        # back_drive_base=back_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
         touch_sensor=touch_sensor,
         gyro_sensor=gyro_sensor
     )
 
+# Set constants for the robot
+robot.ROWS = ROWS
+robot.COLUMNS = COLUMNS
+robot.TILE_WIDTH = TILE_WIDTH
+robot.HOME_BASE_X = HOME_BASE_X
+robot.HOME_BASE_Y = HOME_BASE_Y
 
-
-
-def CheckIfOutOfBounds():
-    distance = ultrasonic_sensor.distance()
-    #temp distance
-    if distance < 50:
-        ev3.speaker.beep()
-        robot.stop()
-        return True
-    return False
-
-def FindAngleBetweenPoints(x1, y1, x2, y2):
-    deltaY = y2 - y1
-    deltaX = x2 - x1
-    angleInRadians = math.atan2(deltaY, deltaX)
-    angleInDegrees = math.degrees(angleInRadians)
-    return angleInDegrees
-
-#pythag theorem to find dist between 2 points
-def FindDistanceBetweenPoints(x1, y1, x2, y2):
-    deltaY = y2 - y1
-    deltaX = x2 - x1
-    distance = math.sqrt(deltaX**2 + deltaY**2)
-    return distance
-
-StartGridMovement()
+# Start the grid movement
+robot.StartGridMovement()
