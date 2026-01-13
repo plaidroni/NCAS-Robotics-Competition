@@ -100,17 +100,19 @@ class Robot:
             if self.ultrasonic_sensor:
                 distanceToObstacle = self.ultrasonic_sensor.distance()
                 
+                self.checkMaterials()
+
                 # If object is detected, stop and collect it
                 if distanceToObstacle < 50:  # 50mm threshold
                     self.front_drive_base.stop()
                     self.obstacleDetectedLocations.append((self.x, self.y))
                     
                     # Keep identifying material
-                    material = self.identify_material()
+                    #material = self.identify_material()
                     #TODO: do something with material info
 
                     # ideally it will say whatever it found
-                    self.ev3.speaker.say("Object detected: " + str(material))
+                    #self.ev3.speaker.say("Object detected: " + str(material))
                     
                     self.StartCollectItem()
                     
@@ -154,6 +156,17 @@ class Robot:
             return color
         return None
 
+
+    def checkMaterials(self):
+        # Check the color of the collected item
+        color = self.color_sensor.color()
+        if color == Color.WHITE:
+            self.ev3.speaker.say("White material collected")
+        elif color == Color.YELLOW:
+            self.ev3.speaker.say("Yellow material collected")
+        elif color == Color.GREEN:
+            self.ev3.speaker.say("Green material collected")
+
     def clawOpen(self):
         if self.claw_motor:
             self.claw_motor.run_angle(200, 300)  # Open claw by 90 degrees
@@ -167,12 +180,13 @@ class Robot:
         wait(500)  # Wait for claw to open
         self.isCollecting = True
         self.ev3.speaker.beep()
-        wait(1000)  # Wait for grabbing action
-        self.clawClose()
+        #wait(1000)  # Wait for grabbing action
+        #self.clawClose()
         wait(500)  # Wait for claw to close
-        self.EndCollectItem()
 
     def EndCollectItem(self):
+        self.clawClose()
+        wait(500)  # Wait for claw to close
         self.isCollecting = False
         self.ev3.speaker.beep()
 

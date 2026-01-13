@@ -8,6 +8,7 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
 from robot import Robot
+from basicmovement import *
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
@@ -62,4 +63,12 @@ robot.TILE_WIDTH = TILE_WIDTH
 robot.HOME_BASE_X = HOME_BASE_X
 robot.HOME_BASE_Y = HOME_BASE_Y
 
-robot.StartGridMovement()
+def bootSequence():
+    robot.ev3.screen.print("booting, left arrow simple, right arrow grid")
+    while True:
+        if (Button.LEFT in robot.ev3.buttons.pressed()):
+            basicmovement.DriveUntilObstacleAndCollect()
+            while True:
+                robot.checkMaterials()
+        elif (Button.RIGHT in robot.ev3.buttons.pressed()):
+            robot.StartGridMovement()
