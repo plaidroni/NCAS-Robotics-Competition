@@ -165,9 +165,9 @@ class Robot:
         # Check the color of the collected item
         color = self.color_sensor.color()
         if color == Color.WHITE:
-            self.ev3.speaker.say("White material collected")
+            self.ev3.speaker.say("White material identified")
         elif color == Color.YELLOW:
-            self.ev3.speaker.say("Yellow material collected")
+            self.ev3.speaker.say("Yellow material identified")
         elif color == Color.GREEN:
             self.ev3.speaker.say("Green material collected")
 
@@ -179,7 +179,7 @@ class Robot:
     def clawClose(self):
         if self.claw_motor:
             # Higher speed and hold to fully close
-            self.claw_motor.run_angle(800, -720, then=Stop.HOLD, wait=True)
+            self.claw_motor.run_until_stalled(600, then=Stop.HOLD, duty_limit=50)
 
     def StartCollectItem(self):
         self.ev3.speaker.say("Object detected, collecting now.")
