@@ -14,8 +14,8 @@ ev3 = EV3Brick()
 #constants
 WHEEL_DIAMETER = 35  # Wheel diameter in millimeters.
 AXLE_TRACK = 230       # Distance between the centers of the two wheels.
-LENGTH_ARENA = 1800  # Arena dimensions in millimeters.
-WIDTH_ARENA = 1800  # Arena dimensions in millimeters.
+LENGTH_ARENA = 3500  # Arena dimensions in millimeters.
+WIDTH_ARENA = 1740  # Arena dimensions in millimeters.
 #we should find the numbers of rows and columns during our walkthrough of the arena
 ROWS = 3  # Number of rows of tiles.
 COLUMNS = 6  # Number of columns of tiles.

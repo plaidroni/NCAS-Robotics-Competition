@@ -50,7 +50,7 @@ class Robot:
         self.ultrasonic_sensor = ultrasonic_sensor
         # self.touch_sensor = touch_sensor
         self.gyro_sensor = gyro_sensor
-        
+        self.claw_motor = claw_motor
         
         if self.gyro_sensor:
             self.gyro_sensor.reset_angle(0)
@@ -156,22 +156,23 @@ class Robot:
 
     def clawOpen(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(200, 90)  # Open claw by 90 degrees
+            self.claw_motor.run_angle(200, 180)  # Open claw by 90 degrees
 
     def clawClose(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(200, -90)  # Close claw by 90 degrees
+            self.claw_motor.run_angle(800, -180)  # Close claw by 90 degrees
 
     def StartCollectItem(self):
-        self.clawClose()
+        self.clawOpen()
+        wait(500)  # Wait for claw to open
         self.isCollecting = True
         self.ev3.speaker.beep()
-        # Add motor control for collection mechanism here
-        
+        wait(1000)  # Wait for grabbing action
+        self.clawClose()
+        wait(500)  # Wait for claw to close
         self.EndCollectItem()
 
     def EndCollectItem(self):
-        self.clawClose()
         self.isCollecting = False
         self.ev3.speaker.beep()
 
@@ -232,8 +233,14 @@ class Robot:
             
         targetAngle = math.degrees(math.atan2(deltaY, deltaX))
         
-        # Turn to face target
+        # Turn to face target - calculate shortest angle
         angleDiff = targetAngle - self.theta
+        # Normalize to [-180, 180] for shortest rotation
+        if angleDiff > 180:
+            angleDiff -= 360
+        elif angleDiff < -180:
+            angleDiff += 360
+        
         self.turn(angleDiff)
         
         # Drive to target WITHOUT obstacle checking from internal drivebase function
@@ -263,19 +270,21 @@ class Robot:
             
             if row < self.ROWS - 1:
                 if row % 2 == 0:
-                    self.turn(70)
+                    self.turn(50)
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
-                    self.turn(70)  # Turn right to face the next row
+                    self.turn(50)  # Turn right to face the next row
                     self.ev3.speaker.beep()
                 else:
-                    self.turn(-70)  # Turn left at the end of the row
+                    self.turn(-50)  # Turn left at the end of the row
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
-                    self.turn(-70)  # Turn left to face the next row
+                    self.turn(-90)  # Turn left to face the next row
                     self.ev3.speaker.beep()
                 
                 if self.CheckIfOutOfBounds():
                     self.ReturnToHomeBase()
                     self.ev3.speaker.say("Out of bounds detected. Returning to home base.")
+                    self.ReturnToAngle(0)
+                    self.StartGridMovement()
         
         # After completing the grid, return to home base
         self.ReturnToHomeBase()
