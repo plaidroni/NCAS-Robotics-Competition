@@ -46,8 +46,8 @@ front_drive_base = DriveBase(front_left_motor, front_right_motor, wheel_diameter
 
 #initialize the robot
 robot = Robot(
+        ev3=ev3,
         front_drive_base=front_drive_base,
-        # back_drive_base=back_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
         gyro_sensor=gyro_sensor,

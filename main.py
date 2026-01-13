@@ -62,6 +62,11 @@ robot.COLUMNS = COLUMNS
 robot.TILE_WIDTH = TILE_WIDTH
 robot.HOME_BASE_X = HOME_BASE_X
 robot.HOME_BASE_Y = HOME_BASE_Y
+#check on startup if we would like to run basic movement or startgridmovement from ev3 button press
+if Button.CENTER in ev3.buttons.pressed():
+    runBasicMovement = True
+elif Button.UP in ev3.buttons.pressed():
+    runBasicMovement = False
 
 def bootSequence():
     robot.ev3.screen.print("booting, left arrow simple, right arrow grid")
@@ -72,3 +77,6 @@ def bootSequence():
                 robot.checkMaterials()
         elif (Button.RIGHT in robot.ev3.buttons.pressed()):
             robot.StartGridMovement()
+
+# Start the boot sequence
+bootSequence()

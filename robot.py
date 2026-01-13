@@ -97,6 +97,8 @@ class Robot:
         
         while abs(self.front_drive_base.distance() - target_distance) > 10:
             # Check for obstacles if ultrasonic sensor is available
+            # set real theta to gyo angle if available
+            self.UpdateAndCheckAngle()
             if self.ultrasonic_sensor:
                 distanceToObstacle = self.ultrasonic_sensor.distance()
                 
@@ -128,6 +130,8 @@ class Robot:
                     
                     # Restart driving
                     self.front_drive_base.drive(200, 0)
+
+                    
             
             # Maintain heading if gyro sensor is available
             # if self.gyro_sensor:
@@ -169,11 +173,11 @@ class Robot:
 
     def clawOpen(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(200, 300)  # Open claw by 90 degrees
+            self.claw_motor.run_angle(200, 720)  # Open claw by 90 degrees
 
     def clawClose(self):
         if self.claw_motor:
-            self.claw_motor.run_angle(800, -300)  # Close claw by 90 degrees
+            self.claw_motor.run_angle(800, -720)  # Close claw by 90 degrees
 
     def StartCollectItem(self):
         self.clawOpen()
