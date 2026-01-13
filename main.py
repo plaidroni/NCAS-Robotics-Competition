@@ -69,10 +69,10 @@ elif Button.UP in ev3.buttons.pressed():
     runBasicMovement = False
 
 def bootSequence():
-    robot.ev3.screen.print("booting, left arrow simple, right arrow grid")
+    robot.ev3.screen.print("L-Simple, R-Grid")
     while True:
         if (Button.LEFT in robot.ev3.buttons.pressed()):
-            basicmovement.DriveUntilObstacleAndCollect()
+            DriveUntilObstacleAndCollect()
             while True:
                 robot.checkMaterials()
         elif (Button.RIGHT in robot.ev3.buttons.pressed()):

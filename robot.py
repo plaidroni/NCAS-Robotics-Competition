@@ -195,9 +195,9 @@ class Robot:
         self.ev3.speaker.beep()
 
     def UpdateAndCheckAngle(self):
+        # Use gyro as the authoritative current heading without overwriting desired theta
         if self.gyro_sensor:
-            self.theta = self.gyro_sensor.angle()
-            return self.theta
+            return self.gyro_sensor.angle()
         return None
 
     def TestSensors(self):
@@ -231,14 +231,14 @@ class Robot:
     
     def ReturnToAngle(self, targetAngle):
         # Logic to return to path after ReturnToHomeBase
-        if self.gyro_sensor:
-            currentAngle = self.gyro_sensor.angle()
-            angleDiff = targetAngle - currentAngle
-            self.turn(angleDiff)
-        else:
-            # If no gyro, turn to target angle based on current theta
-            angleDiff = targetAngle - self.theta
-            self.turn(angleDiff)
+        currentAngle = self.gyro_sensor.angle() if self.gyro_sensor else self.theta
+        angleDiff = targetAngle - currentAngle
+        if angleDiff > 180:
+            angleDiff -= 360
+        elif angleDiff < -180:
+            angleDiff += 360
+        self.turn(angleDiff)
+        self.theta = targetAngle % 360
 
     def GoToPosition(self, target_x, target_y):
         # Calculate angle and distance to target
@@ -251,8 +251,10 @@ class Robot:
             
         targetAngle = math.degrees(math.atan2(deltaY, deltaX))
         
+        # Use gyro for actual heading when available
+        current_heading = self.gyro_sensor.angle() if self.gyro_sensor else self.theta
         # Turn to face target - calculate shortest angle
-        angleDiff = targetAngle - self.theta
+        angleDiff = targetAngle - current_heading
         # Normalize to [-180, 180] for shortest rotation
         if angleDiff > 180:
             angleDiff -= 360
@@ -260,6 +262,8 @@ class Robot:
             angleDiff += 360
         
         self.turn(angleDiff)
+        # Desired heading now matches target angle
+        self.theta = targetAngle % 360
         
         # Drive to target WITHOUT obstacle checking from internal drivebase function
         self.front_drive_base.straight(distance)
@@ -288,12 +292,12 @@ class Robot:
             
             if row < self.ROWS - 1:
                 if row % 2 == 0:
-                    self.turn(50)
+                    self.turn(90)
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
-                    self.turn(50)  # Turn right to face the next row
+                    self.turn(90)  # Turn right to face the next row
                     self.ev3.speaker.beep()
                 else:
-                    self.turn(-50)  # Turn left at the end of the row
+                    self.turn(-90)  # Turn left at the end of the row
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
                     self.turn(-90)  # Turn left to face the next row
                     self.ev3.speaker.beep()
