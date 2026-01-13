@@ -21,7 +21,7 @@ COLUMNS = 3  # Number of columns of tiles.
 TILE_WIDTH = LENGTH_ARENA // COLUMNS  # Size of each tile in millimeters.
 HOME_BASE_X = 0
 HOME_BASE_Y = 0
-
+global totalDistance = 0
 
 
 # Initialize the EV3 Brick.
@@ -56,7 +56,19 @@ robot = Robot(
 def DriveUntilObstacleAndCollect():
     while True:
         distance = ultrasonic_sensor.distance()
+
+        # update total distance traveled, so we can go backwards said distance
+        totalDistance += distance
+
         if distance < 5: #percentage distance to obstacle
             robot.StartCollectItem()
+            robot.straightSimple(totalDistance, -1)  # go back the total distance traveled
             break
-        robot.straight(distance)
+
+        # just because ultasonic sensors can be a bit iffy sometimes
+        elif distance > 500:
+            distance = 500
+
+        robot.straightSimple(distance)
+
+DriveUntilObstacleAndCollect()

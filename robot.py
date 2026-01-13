@@ -6,6 +6,8 @@ from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import math
+import time
+import webcolors
 
 class Robot:
     # Constants - will be set from main
@@ -89,6 +91,9 @@ class Robot:
                     # Keep identifying material
                     material = self.identify_material()
                     #TODO: do something with material info
+
+                    # ideally it will say whatever it found
+                    self.ev3.speaker.say("Object detected: " + str(material))
                     
                     self.StartCollectItem()
                     
@@ -127,14 +132,40 @@ class Robot:
 # ambient()
 # Measures the ambient light intensity.
 
+    def straightSimple(self, distance, forwards=1):
+        
+        self.front_drive_base.drive((distance * forwards), 0)
+        # assuming default speed of 200mm/s
+        time.sleep(distance / 200)
+        
+def get_color_name(rgb_tuple):
+    try:
+        # Convert RGB to hex
+        hex_value = webcolors.rgb_to_hex(rgb_tuple)
+        # Get the color name directly
+        return webcolors.hex_to_name(hex_value)
+    except ValueError:
+        # If exact match not found, find the closest color
+        return closest_color(rgb_tuple)
+
+def findColor():
+    color = [0, 0, 0]
+    for i in range(len(self.color_sensor.rgb())):
+        color[i] = (self.color_sensor.rgb()[i] * 255)
+    return get_color_name((color[0], color[1], color[2]))
+
 # rgb()
 # Measures the reflection of a surface using a red, green, and then a blue light.
 
     # Identify material using color sensor and beep based on material
     def identify_material(self):
         if self.color_sensor:
-            color = self.color_sensor.color()
-            return color
+            
+            # ideally a better method
+            return findColor()
+
+            #color = self.color_sensor.color()
+            #return color
         return None
 
     def StartCollectItem(self):
