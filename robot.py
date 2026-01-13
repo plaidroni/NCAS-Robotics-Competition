@@ -9,11 +9,7 @@ import math
 
 class Robot:
     # Constants - will be set from main
-    ROWS = 6
-    COLUMNS = 3
-    TILE_WIDTH = 600
-    HOME_BASE_X = 0
-    HOME_BASE_Y = 0
+
     
     x = 0
     y = 0
@@ -39,7 +35,7 @@ class Robot:
         front_drive_base,
         color_sensor=None,
         ultrasonic_sensor=None,
-        touch_sensor=None,
+        # touch_sensor=None,
         gyro_sensor=None
     ):
         self.x = 0
@@ -49,7 +45,7 @@ class Robot:
         self.front_drive_base = front_drive_base
         self.color_sensor = color_sensor
         self.ultrasonic_sensor = ultrasonic_sensor
-        self.touch_sensor = touch_sensor
+        # self.touch_sensor = touch_sensor
         self.gyro_sensor = gyro_sensor
         
         
@@ -71,6 +67,7 @@ class Robot:
     def turn(self, angle):
         self.front_drive_base.turn(angle)
         self.theta = (self.theta + angle) % 360
+
 
     # Move straight while checking for obstacles
     def straight(self, distance):
@@ -109,14 +106,14 @@ class Robot:
                     self.front_drive_base.drive(200, 0)
             
             # Maintain heading if gyro sensor is available
-            if self.gyro_sensor:
-                current_angle = self.gyro_sensor.angle()
-                if abs(current_angle - self.theta) > self.thresholdAngle:
-                    self.front_drive_base.stop()
-                    self.turn(self.theta - current_angle)
-                    self.front_drive_base.drive(200, 0)
+            # if self.gyro_sensor:
+            #     current_angle = self.gyro_sensor.angle()
+            #     if abs(current_angle - self.theta) > self.thresholdAngle:
+            #         self.front_drive_base.stop()
+            #         self.turn(self.theta - current_angle)
+            #         self.front_drive_base.drive(200, 0)
             
-            wait(50)
+            # wait(50)
         
         self.front_drive_base.stop()
         
@@ -204,8 +201,8 @@ class Robot:
         deltaX = target_x - self.x
         deltaY = target_y - self.y
         distance = math.sqrt(deltaX**2 + deltaY**2)
-        
-        if distance < 10:  # Already at target, no need to move
+        # already at target, no need to move
+        if distance < 10: 
             return
             
         targetAngle = math.degrees(math.atan2(deltaY, deltaX))
@@ -214,10 +211,10 @@ class Robot:
         angleDiff = targetAngle - self.theta
         self.turn(angleDiff)
         
-        # Drive to target WITHOUT obstacle checking (internal navigation)
+        # Drive to target WITHOUT obstacle checking from internal drivebase function
         self.front_drive_base.straight(distance)
         
-        # Update position
+        # Update robot's internal position. Let's hope that the movement was accurate!
         self.x = target_x
         self.y = target_y
 
@@ -244,10 +241,12 @@ class Robot:
                     self.turn(90)
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
                     self.turn(90)  # Turn right to face the next row
+                    self.ev3.speaker.beep()
                 else:
                     self.turn(-90)  # Turn left at the end of the row
                     self.straight(self.TILE_WIDTH)  # Move down to the next row
                     self.turn(-90)  # Turn left to face the next row
+                    self.ev3.speaker.beep()
                 
                 if self.CheckIfOutOfBounds():
                     return

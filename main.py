@@ -12,8 +12,8 @@ from robot import Robot
 ev3 = EV3Brick()
 
 #constants
-WHEEL_DIAMETER = 55.5  # Wheel diameter in millimeters.
-AXLE_TRACK = 104       # Distance between the centers of the two wheels.
+WHEEL_DIAMETER = 140  # Wheel diameter in millimeters.
+AXLE_TRACK = 230       # Distance between the centers of the two wheels.
 LENGTH_ARENA = 1800  # Arena dimensions in millimeters.
 WIDTH_ARENA = 1800  # Arena dimensions in millimeters.
 #we should find the numbers of rows and columns during our walkthrough of the arena
@@ -28,12 +28,6 @@ HOME_BASE_Y = 0
 MINERALS = []
 
 
-#Initialize the sensors
-# color_sensor = ColorSensor(Port.S1)
-# ultrasonic_sensor = UltrasonicSensor(Port.S2)
-# touch_sensor = TouchSensor(Port.S3)
-# gyro_sensor = GyroSensor(Port.S4)
-
 color_sensor = ColorSensor(Port.S1)
 ultrasonic_sensor = UltrasonicSensor(Port.S2)
 # touch_sensor = TouchSensor(Port.S3)
@@ -42,6 +36,7 @@ gyro_sensor = GyroSensor(Port.S4)
 # Initialize the motors.
 front_left_motor = Motor(Port.D)
 front_right_motor = Motor(Port.C)
+grabber_motor = Motor(Port.B)
 # back_left_motor = Motor(Port.B)
 # back_right_motor = Motor(Port.A)
 
@@ -56,7 +51,6 @@ robot = Robot(
         front_drive_base=front_drive_base,
         color_sensor=color_sensor,
         ultrasonic_sensor=ultrasonic_sensor,
-        touch_sensor=touch_sensor,
         gyro_sensor=gyro_sensor
     )
 
@@ -67,5 +61,4 @@ robot.TILE_WIDTH = TILE_WIDTH
 robot.HOME_BASE_X = HOME_BASE_X
 robot.HOME_BASE_Y = HOME_BASE_Y
 
-# Start the grid movement
 robot.StartGridMovement()
