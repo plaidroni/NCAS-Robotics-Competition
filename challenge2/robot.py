@@ -4,7 +4,7 @@ class Robot:
     color_sensor = None
     ultrasonic_sensor = None
     touch_sensor = None
-    gyro_sensor = None
+    # gyro_sensor = None
     claw_motor = None
     ev3 = None
     isCollecting = False
@@ -15,8 +15,8 @@ class Robot:
         ev3,
         front_drive_base,
         color_sensor=None,
-        # ultrasonic_sensor=None,
-        # touch_sensor=None,
+        ultrasonic_sensor=None,
+        touch_sensor=None,
         gyro_sensor=None,
         claw_motor=None
     ):
@@ -26,26 +26,24 @@ class Robot:
         self.ev3 = ev3
         self.drive_base = drive_base
         self.color_sensor = color_sensor
-        # self.ultrasonic_sensor = ultrasonic_sensor
-        # self.touch_sensor = touch_sensor
-        self.gyro_sensor = gyro_sensor
+        self.ultrasonic_sensor = ultrasonic_sensor
+        self.touch_sensor = touch_sensor
+        # self.gyro_sensor = gyro_sensor
         self.claw_motor = claw_motor
-        
-        if self.gyro_sensor:
-            self.gyro_sensor.reset_angle(0)
-            self.ev3.speaker.beep()
-            wait(10)
+
     #TODO: This may have some threading issues, so we may need to refactor later.
     # Test with the hardware, and maybe put everything into a while true loop.
     def Start(self):
 
-        
         #check for constants, always running. I'm unsure if we can multithread like this, but we'll see during tests.
 
         while self.isCollecting:
             self.claw_motor.run(10)  # Apply constant torque to keep claw closed slightly
 
         while True:
+            if(self.isDriving):
+                self.drive_base.drive(500, 0)
+
             #If we run out of bounds, stop driving and go back
             if(self.CheckIfOutOfBounds()):  
                 self.drive_base.stop()
@@ -53,24 +51,21 @@ class Robot:
                 self.drive_base.drive(-500)
                 #continue keyword skips the rest of the code, so that we are no longer checking for materials, and just ensuring that we make it home.
                 continue
+
             #Stop driving for a moment, so that the judge knows that we've noticed the material.
+            #TODO: Continously check for minerals
             if(self.CheckForMaterials()):
                 isDriving = False
                 wait(150)
                 isDriving = True
                 
-            #TODO: Continously check for minerals
+            #TODO: Drive forward until we hit something with either the touch sensor, or ultrasonic sensor
             if(self.isObjectInFront()):
                 self.drive_base.stop()
                 self.BeginCollectionSequence()
-        
-        #TODO: Drive forward until we hit something with either the touch sensor, or ultrasonic sensor
+                self.BeginExtractionSequence()
         
 
-        #TODO: Begin collection sequence
-       
-        #Begin heading home
-        self.BeginExtractionSequence()
 
              
         #TODO: Back up to starting position
@@ -81,12 +76,12 @@ class Robot:
         #Drive forward slightly
         self.drive_base.straight(10)
         #TODO: experiment with the best values
-        self.claw_motor.run_until_stopped(600,)  # Close claw
+        self.claw_motor.run_until_stopped(600,Stop.COAST,30)  # Close claw
 
     def BeginExtractionSequence(self):
         self.ev3.speaker.say("Object secured, heading home")
         #Drive forward slightly
-        self.drive_base.straight(10)
+        self.drive_base.straight(-200)
 
     def CheckForMaterials(self):
         if(self.color_sensor.color() == ColorSensor.COLOR_YELLOW):
