@@ -61,5 +61,16 @@ robot.TILE_WIDTH = TILE_WIDTH
 robot.HOME_BASE_X = HOME_BASE_X
 robot.HOME_BASE_Y = HOME_BASE_Y
 
+# left vs right preference code
+while True:
+    if (Button.LEFT in robot.ev3.buttons.pressed()):
+        robot.StartLeft()
+        break
+    elif (Button.RIGHT in robot.ev3.buttons.pressed()):
+        robot.StartRight()
+        break
+
 #TODO: put in intialize function here
-robot.Start()
+# robot.Start() ~ no longer best option
+
+robot.ev3.beep()  # everything is done :p
