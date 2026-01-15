@@ -1,3 +1,13 @@
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+                                 InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+import math
+from robot import Robot
+
 class Robot:
     # Constants - will be set from main
     drive_base = None
@@ -13,7 +23,7 @@ class Robot:
     def __init__(
         self,
         ev3,
-        front_drive_base,
+        drive_base,
         color_sensor=None,
         ultrasonic_sensor=None,
         touch_sensor=None,
@@ -65,7 +75,7 @@ class Robot:
                 self.BeginCollectionSequence()
                 self.BeginExtractionSequence()
         
-
+        #add timer to come back
 
              
         #TODO: Back up to starting position

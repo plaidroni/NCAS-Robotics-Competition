@@ -29,14 +29,14 @@ MINERALS = []
 
 
 color_sensor = ColorSensor(Port.S1)
-ultrasonic_sensor = UltrasonicSensor(Port.S2)
-touch_sensor = TouchSensor(Port.S3)
+# ultrasonic_sensor = UltrasonicSensor(Port.S2)
+# touch_sensor = TouchSensor(Port.S3)
 gyro_sensor = GyroSensor(Port.S4)
 
 # Initialize the motors.
 front_left_motor = Motor(Port.D)
 front_right_motor = Motor(Port.C)
-grabber_motor = Motor(Port.B)
+# grabber_motor = Motor(Port.B)
 
 
 
@@ -46,10 +46,10 @@ drive_base = DriveBase(front_left_motor, front_right_motor, wheel_diameter=WHEEL
 #initialize the robot
 robot = Robot(
         ev3=ev3,
-        front_drive_base=drive_base,
+        drive_base=drive_base,
         color_sensor=color_sensor,
-        touch_sensor=touch_sensor,
-        ultrasonic_sensor=ultrasonic_sensor,
+        # touch_sensor=touch_sensor,
+        # ultrasonic_sensor=ultrasonic_sensor,
         gyro_sensor=gyro_sensor,
         claw_motor=grabber_motor
     )
