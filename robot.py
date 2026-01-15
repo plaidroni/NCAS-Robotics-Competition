@@ -16,6 +16,7 @@ class Robot:
     isDriving = False
     isDrivingForward = True
     turn_rate = 0
+    target_heading = 0
 
     def __init__(
         self,
@@ -32,6 +33,7 @@ class Robot:
         self.turn_rate = 0
         self.ev3 = ev3
         self.isDriving = True
+        self.target_heading = 0
         self.isDrivingForward = True
         self.drive_base = front_drive_base
         self.color_sensor = color_sensor
@@ -55,7 +57,7 @@ class Robot:
                 self.claw_motor.run(10)
 
             if(self.isDriving and self.gyro_sensor):
-                error = target_heading - self.gyro_sensor.angle()
+                error = self.target_heading - self.gyro_sensor.angle()
                 print("Gyro Error: ", error)
                 self.ev3.screen.print("Gyro Error: {}".format(error))
                 kP = 2.5
@@ -103,11 +105,15 @@ class Robot:
         #Drive forward slightly
         self.drive_base.straight(10)
         #TODO: experiment with the best values
-        self.claw_motor.run_until_stalled(2000,Stop.COAST,30)  # Close claw
+        if(self.claw_motor):
+            self.claw_motor.run_until_stalled(2000,Stop.COAST,30)  # Close claw
 
     def BeginExtractionSequence(self):
         self.ev3.speaker.beep()
-        isDrivingForward = False
+        self.target_heading = (self.target_heading + 180) % 360
+        #If we want to try to fix the gyro issue, then we should set isDrivingForward to true here.
+        self.isDrivingForward = False
+        # self.isDrivingForward = True
         #Drive forward slightly
 
     def CheckForMaterials(self):
