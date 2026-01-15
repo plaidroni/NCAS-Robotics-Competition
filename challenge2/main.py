@@ -27,10 +27,10 @@ HOME_BASE_Y = 0
 #mineral dictionary
 MINERALS = []
 
-
+# changed the commented out stuff here because when we init the robot object, we pass those sensors ykyk
 color_sensor = ColorSensor(Port.S1)
-# ultrasonic_sensor = UltrasonicSensor(Port.S2)
-# touch_sensor = TouchSensor(Port.S3)
+ultrasonic_sensor = UltrasonicSensor(Port.S2)
+touch_sensor = TouchSensor(Port.S3)
 gyro_sensor = GyroSensor(Port.S4)
 
 # Initialize the motors.
