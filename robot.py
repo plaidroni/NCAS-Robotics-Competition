@@ -42,6 +42,8 @@ class Robot:
         self.gyro_sensor = gyro_sensor
         self.claw_motor = claw_motor
 
+        self.ev3.volume(100)
+
     #TODO: This may have some threading issues, so we may need to refactor later.
     # Test with the hardware, and maybe put everything into a while true loop.
     def Start(self):
