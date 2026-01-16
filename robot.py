@@ -42,12 +42,14 @@ class Robot:
         self.gyro_sensor = gyro_sensor
         self.claw_motor = claw_motor
 
-        self.ev3.volume(100)
 
     #TODO: This may have some threading issues, so we may need to refactor later.
     # Test with the hardware, and maybe put everything into a while true loop.
     def Start(self):
-        target_heading = self.gyro_sensor.angle()
+        self.target_heading = self.gyro_sensor.angle()
+        #open the claw
+        if(self.claw_motor):
+            self.claw_motor.run_time(-2000, 200, then=Stop.HOLD, wait=True)  # Open claw
 
         #check for constants, always running. I'm unsure if we can multithread like this, but we'll see during tests.
 
@@ -112,7 +114,7 @@ class Robot:
 
     def BeginExtractionSequence(self):
         self.ev3.speaker.beep()
-        self.target_heading = (self.target_heading + 180) % 360
+        # self.target_heading = (self.target_heading + 180) % 360
         #If we want to try to fix the gyro issue, then we should set isDrivingForward to true here.
         self.isDrivingForward = False
         # self.isDrivingForward = True
@@ -137,6 +139,6 @@ class Robot:
             distance = self.ultrasonic_sensor.distance()
             if distance < 65 or distance > 250:
                 return True
-        if self.touch_sensor and self.touch_sensor.pressed():
-            return True
+        # if self.touch_sensor and self.touch_sensor.pressed():
+        #     return True
         return False
